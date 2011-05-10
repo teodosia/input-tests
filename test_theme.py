@@ -16,7 +16,7 @@
 #
 # The Initial Developer of the Original Code is
 # Mozilla Corp.
-# Portions created by the Initial Developer are Copyright (C) 2010
+# Portions created by the Initial Developer are Copyright (C) 2011
 # the Initial Developer. All Rights Reserved.
 #
 # Contributor(s): teodosia.pop@softvision.ro
@@ -59,73 +59,56 @@ class TestThemePage(unittest.TestCase):
     def test_navigate_to_theme_page(self):
         '''
         This testcase covers #15170 in Litmus
-        Verify you are able to navigate to individual theme page, 
-        includes # of messages, page title = THEME, includes link 
-        'Back to all themes', each theme is listed with a lightbulb icon, 
-        the suggestion text, a relative date '1 day ago', the user platform, 
-        language 3. Verify timestamp link goes to the suggestion, 
-        the Platform link goes to that product filter, verify language
-        goes to locale filter.
+        Verify you are able to navigate to individual theme page, includes # of messages,
+        page title = THEME, includes link 'Back to all themes', each theme is listed with a 
+        lightbulb icon, the suggestion text, a relative date '1 day ago', the user platform, 
+        language 3. Verify timestamp link goes to the suggestion, the Platform link goes to 
+        that product filter, verify language goes to locale filter.
         '''
-        themes_pg = themes_page.ThemesPage(self.selenium)
+        themes_pg = themes_page.ThemesPage(self.selenium) 
+        themes_pg.go_to_themes_page() 
+        themes_pg.themes[0].click_similar_messages()
+        theme_pg = theme_page.ThemePage(self.selenium)
         
-        themes_pg.go_to_themes_page()
-        #navigate to individual theme page
-        theme_msg = themes_pg.themes
-        theme_msg[0].click_similar_messages()
-        theme = theme_page.ThemePage(self.selenium)
-        
-        #page title = THEME
-        self.assertEqual(theme.messages_heading, "Theme")
-        
-        #includes link 'Back to all themes'
-        self.assertTrue(theme.is_back_to_all_themes_link_visible())
-                
-        #message number
-        self.assertTrue(theme.is_message_count_visble())
-                
+        self.assertEqual(theme_pg.messages_heading, "Theme")
+        self.assertTrue(theme_pg.is_back_link_visible())
+        self.assertTrue(theme_pg.is_message_count_visble())
+               
     def test_platform_link(self):
-        themes_pg = themes_page.ThemesPage(self.selenium)
-        themes_pg.go_to_themes_page()
-        theme_msg = themes_pg.themes
-        theme_msg[0].click_similar_messages()
-        theme = theme_page.ThemePage(self.selenium)
+        themes_pg = themes_page.ThemesPage(self.selenium) 
+        themes_pg.go_to_themes_page() 
+        themes_pg.themes[0].click_similar_messages()
+        theme_pg = theme_page.ThemePage(self.selenium)
         
-        #includes the user platform
-        self.assertTrue(theme.message(1).is_platform_visble())
-        
-        #Platform link goes to that product filter
-        theme.click_platform_link()
-        filter = theme.platform_from_url
-        platform = theme.message(1).platform
-        self.assertTrue(theme.platform_goes_to_product_filter(filter, platform))
-        
+        self.assertTrue(theme_pg.message(1).is_platform_visble())
+        theme_pg.message(1).click_platform_link()
+        filter = theme_pg.platform_from_url
+        platform = theme_pg.message(1).platform
+        self.assertTrue(theme_pg.message(1).platform_goes_to_product_filter(filter, platform))
+     
     def test_locale_link(self):
-        themes_pg = themes_page.ThemesPage(self.selenium)
-        themes_pg.go_to_themes_page()
-        theme_msg = themes_pg.themes
-        theme_msg[0].click_similar_messages()
-        theme = theme_page.ThemePage(self.selenium)
+        themes_pg = themes_page.ThemesPage(self.selenium) 
+        themes_pg.go_to_themes_page() 
+        themes_pg.themes[0].click_similar_messages()
+        theme_pg = theme_page.ThemePage(self.selenium)
         
-        #check if language visible
-        self.assertTrue(theme.message(1).is_language_visible())
+        self.assertTrue(theme_pg.message(1).is_language_visible())
     
-        #verify language goes to locale filter
-        theme.click_locale_link()
-        language = theme.message(1).locale
-        locale = theme.locale_from_url
-        self.assertTrue(theme.language_goes_to_locale_filter(language, locale))
+        theme_pg.click_locale_link()
+        language = theme_pg.message(1).locale
+        locale = theme_pg.locale_from_url
+        self.assertTrue(theme_pg.language_goes_to_locale_filter(language, locale))
         
     def test_timestamp_link(self):
-        themes_pg = themes_page.ThemesPage(self.selenium)
-        themes_pg.go_to_themes_page()
-        theme_msg = themes_pg.themes
-        theme_msg[0].click_similar_messages()
-        theme = theme_page.ThemePage(self.selenium)
+        themes_pg = themes_page.ThemesPage(self.selenium) 
+        themes_pg.go_to_themes_page() 
+        themes_pg.themes[0].click_similar_messages()
+        theme_pg = theme_page.ThemePage(self.selenium)
         
         #relative date '1 day ago'
-        relative_date = theme.message(1).time
+        relative_date = theme_pg.message(1).time
         self.assertTrue(relative_date.endswith(" ago"))
         
 if __name__ == "__main__":
     unittest.main()
+    

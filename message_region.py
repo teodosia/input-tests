@@ -20,6 +20,7 @@
 # the Initial Developer. All Rights Reserved.
 #
 # Contributor(s): Dave Hunt <dhunt@mozilla.com>
+#                 Teodosia Pop <teodosia.pop@softvision.ro>
 #
 # Alternatively, the contents of this file may be used under the terms of
 # either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -37,6 +38,9 @@
 '''
 Created on Mar 28, 2011
 '''
+from vars import ConnectionParameters
+
+page_load_timeout = ConnectionParameters.page_load_timeout
 
 class Message(object):
 
@@ -52,17 +56,28 @@ class Message(object):
     _translate_message_locator = " li:nth(1) a"
     _tweet_this_locator = " .options .twitter"
 
+    _platform_link_locator = "//div[@id='messages']/ul/li/ul/li[2]/a"
+    _locale_link_locator = "//div[@id='messages']/ul/li/ul/li[3]/a"
+   
     def __init__(self, selenium, index):
         self.selenium = selenium
         self.index = index
 
-    def absolute_locator(self, relative_locator):
-        return self.root_locator + relative_locator
+    def click_platform_link(self):
+        self.selenium.click(self._platform_link_locator)
+        self.selenium.wait_for_page_to_load(page_load_timeout)
+        
+    def click_locale_link(self):
+        self.selenium.click(self._locale_link_locator)
+        self.selenium.wait_for_page_to_load(page_load_timeout)
+    
+    def click_timestamp_link(self):
+        self.selenium.click(self._time_locator)
+        self.selenium.wait_for_page_to_load(page_load_timeout)
     
     def is_platform_visble(self):
         """
-        Returns True if the platform
-         in an individual theme page is visible
+        Returns True if the platform in an individual theme page is visible
         """
         platforms = ("Mac OS X, Windows 7, Windows XP, Windows Vista, Linux, Android, Maemo")
         return platforms.find(self.platform) > -1
@@ -74,7 +89,52 @@ class Message(object):
         language = ("English (US), Spanish, English (British), Portuguese (Brazilian)" +
                     "German, French, Russian, Italian, Polish, Turkish, Hungarian")
         return language.find(self.locale) > -1
-                
+    
+    def platform_goes_to_product_filter(self, filter, platform):
+        platforms = {"Windows 7" : 1, 
+                     "Windows XP": 2,
+                     "Windows Vista" : 3,
+                     "Linux" : 4,
+                     "Mac OS X": 5,
+                     "Android": 6,
+                     "Maemo" : 7}
+        filters = {"win7" : 1, 
+                   "winxp": 2,
+                   "vista" : 3,
+                   "linux" : 4,
+                   "mac": 5,
+                   "android": 6,
+                   "maemo" : 7}
+        return platforms[platform] == filters[filter]
+    
+    def language_goes_to_locale_filter(self, language, locale):
+        languages = {"English (US)": 1,
+                     "Spanish": 2,
+                     "English (British)": 3,
+                     "Portuguese (Brazilian)": 4,
+                     "German": 5,
+                     "French": 6,
+                     "Russian": 7,
+                     "Italian": 8,
+                     "Polish:": 9,
+                     "Turkish": 10,
+                     "Hungarian": 11}
+        locales = {"en-US": 1,
+                   "es": 2,
+                   "en-GB": 3,
+                   "pt-BR": 4,
+                   "de": 5,
+                   "fr": 6,
+                   "ru": 7,
+                   "it": 8,
+                   "pl": 9,
+                   "tr": 10,
+                   "hu": 11}
+        return languages[language] == locales[locale]
+    
+    def absolute_locator(self, relative_locator):
+        return self.root_locator + relative_locator    
+           
     @property
     def root_locator(self):
         return "css=#messages .message:nth(" + str(self.index - 1) + ")"
@@ -94,6 +154,10 @@ class Message(object):
     @property
     def platform(self):
         return self.selenium.get_text(self.absolute_locator(self._platform_locator))
+    
+    @property
+    def platform_link(self):
+        return self.selenium.get_value(self.absolute_locator(self._platform_locator))
         
     @property
     def locale(self):

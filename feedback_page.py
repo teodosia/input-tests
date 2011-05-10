@@ -21,6 +21,7 @@
 #
 # Contributor(s): Vishal
 #                 Dave Hunt <dhunt@mozilla.com>
+#                 Teodosia Pop <teodosia.pop@softvision.ro>
 #
 # Alternatively, the contents of this file may be used under the terms of
 # either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -67,6 +68,7 @@ class FeedbackPage(input_base_page.InputBasePage):
     _datepicker_year_locator = "css=.ui-datepicker-year"
     _datepicker_previous_month_locator = "css=.ui-datepicker-prev"
     _datepicker_next_month_locator = "css=.ui-datepicker-next"
+    _datepicker_next_month_disabled_locator = "css=.ui-datepicker-next.ui-state-disabled"
     _datepicker_day_locator_prefix = "css=.ui-datepicker-calendar td:contains("
     _datepicker_day_locator_suffix = ")"
 
@@ -147,7 +149,7 @@ class FeedbackPage(input_base_page.InputBasePage):
     def is_datepicker_visible(self):
         """
 
-        Returns True if the datepicker pop up is visible
+        Returns True if the datepicker pop up is visible ()
 
         """
         date_picker = self.get_attribute(self._datepicker_locator, "style")
@@ -178,11 +180,14 @@ class FeedbackPage(input_base_page.InputBasePage):
         Check if forward button of the calendar pop up is disabled
         
         """
+        """
         month_button = self.selenium.get_attribute("xpath=//div[@id='ui-datepicker-div']/div/a[2]/@class")
         if (month_button.find("disabled") == -1) :
             return False
         else:
             return True
+        """
+        return self.selenium.is_visible(self._datepicker_next_month_disabled_locator)
            
     def wait_for_datepicker_to_finish_animating(self):
         self.selenium.wait_for_condition(
@@ -233,7 +238,10 @@ class FeedbackPage(input_base_page.InputBasePage):
         self.wait_for_element_visible(self._datepicker_day_locator_prefix + str(day) + self._datepicker_day_locator_suffix)
         self.selenium.click(self._datepicker_day_locator_prefix + str(day) + self._datepicker_day_locator_suffix)
         self.wait_for_element_not_visible(self._datepicker_locator)
-
+    
+    def click_search_box(self):
+        self.selenium.click(self._search_box)
+        
     def select_date(self, target_date):
         """
 
@@ -323,3 +331,4 @@ class FeedbackPage(input_base_page.InputBasePage):
 
     def message(self, index):
         return message_region.Message(self.selenium, index)
+    

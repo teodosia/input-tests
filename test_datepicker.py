@@ -50,7 +50,7 @@ import feedback_page
 
 page_load_timeout = ConnectionParameters.page_load_timeout
 
-class CalendarPopupClosure(unittest.TestCase):
+class TestDatePicker(unittest.TestCase):
         
     def setUp(self):
         self.selenium = selenium(ConnectionParameters.server, ConnectionParameters.port,
@@ -61,7 +61,7 @@ class CalendarPopupClosure(unittest.TestCase):
     def tearDown(self):
         self.selenium.stop()
                   
-    def test_calendar_pop_up_closure(self):
+    def test_datepicker_is_only_shown_when_a_date_field_has_focus(self):
         """
         
         This testcase covers # 13726 in Litmus
@@ -91,7 +91,7 @@ class CalendarPopupClosure(unittest.TestCase):
         feedback_pg.click_days("1d")
         self.assertFalse(feedback_pg.is_datepicker_visible())
        
-    def test_calendar_date_present(self):
+    def test_datepicker_selected_date_present(self):
         """
        
         This testcase covers # 13844 in Litmus
@@ -112,7 +112,7 @@ class CalendarPopupClosure(unittest.TestCase):
         feedback_pg.click_day(today_date.day)                         
         self.assertEqual(feedback_pg.custom_end_date, today_date.strftime('%m/%d/%Y'))
         
-    def test_calendar_next_month_disabled(self):
+    def test_datepicker_next_month_button_disabled(self):
         """
        
         This testcase covers # 13844 in Litmus
@@ -124,6 +124,9 @@ class CalendarPopupClosure(unittest.TestCase):
         feedback_pg.go_to_feedback_page()
         feedback_pg.click_custom_dates()  
         feedback_pg.click_start_date()
+        self.assertTrue(feedback_pg.is_next_month_button_disabled())
+        
+        feedback_pg.click_end_date()
         self.assertTrue(feedback_pg.is_next_month_button_disabled())
         
 if __name__ == "__main__":

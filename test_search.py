@@ -93,7 +93,7 @@ class TestSearch(unittest.TestCase):
         feedback_pg = feedback_page.FeedbackPage(self.selenium)
 
         feedback_pg.go_to_feedback_page()
-        self.assertEqual(self.selenium.get_value(feedback_pg.search_box()), "Search by keyword")
+        self.assertEqual(feedback_pg.search_box, "Search by keyword")
     
     def test_search_box_text_disappears_on_click(self):
         '''
@@ -104,8 +104,8 @@ class TestSearch(unittest.TestCase):
         feedback_pg = feedback_page.FeedbackPage(self.selenium)
 
         feedback_pg.go_to_feedback_page()
-        self.selenium.click(feedback_pg.search_box())
-        self.assertEqual(self.selenium.get_value(feedback_pg.search_box()), "")
+        feedback_pg.click_search_box()
+        self.assertEqual(feedback_pg.search_box, "")
 
 if __name__ == "__main__":
     unittest.main()
